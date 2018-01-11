@@ -1,0 +1,18 @@
+language: php
+
+php:
+  - 7.1
+  - 7.2
+
+before_script:
+  - composer self-update
+  - composer install
+  - cp ruleset.xml.dist ruleset.xml
+
+script:
+  #- mkdir -p build/logs
+  #- php vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+  - php vendor/bin/phpcs --standard=ruleset.xml
+
+after_success:
+  #- travis_retry php vendor/bin/coveralls -v

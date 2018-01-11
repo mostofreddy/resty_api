@@ -13,4 +13,9 @@ $app->get('/hello[/{name}]', function ($request, $response, $args) {
     return $response;
 })->setArgument('name', 'World!');
 
+$app->get('/error/1', function ($request, $response, $args) {
+    throw new \Exception("error 1");
+    return $response;
+});
+
 $app->run();

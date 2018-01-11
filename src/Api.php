@@ -18,6 +18,11 @@ namespace Resty\Api;
 
 // Slim
 use Slim\App;
+use Slim\Container;
+// Api
+use Resty\Api\Handlers\Error;
+use Resty\Api\Handlers\NotFound;
+use Resty\Api\Handlers\NotAllowed;
 
 /**
  * Api
@@ -31,4 +36,57 @@ use Slim\App;
  */
 class Api extends App
 {
+    /**
+     * Create new application
+     *
+     * @param ContainerInterface|array $container Either a ContainerInterface or an associative array of app settings
+     * @throws InvalidArgumentException when no container is provided that implements ContainerInterface
+     */
+    public function __construct($container = [])
+    {
+        $container = $this->registerDefaultServices($container);
+        parent::__construct($container);
+    }
+
+    /**
+     * Define servicios para la api
+     *
+     * @param Container|array $container Instancia de container
+     *
+     * @return Container|array
+     */
+    protected function registerDefaultServices($container)
+    {
+        if (!isset($container['errorHandler'])) {
+            $container['errorHandler'] = function (Container $container) {
+                $error = (new Error())
+                    ->setDisplayErrorDetails($container->get('settings')['displayErrorDetails']);
+                return $error;
+            };
+        }
+
+        if (!isset($container['phpErrorHandler'])) {
+            $container['phpErrorHandler'] = function (Container $container) {
+                $error = (new Error())
+                    ->setDisplayErrorDetails($container->get('settings')['displayErrorDetails']);
+                return $error;
+            };
+        }
+
+        if (!isset($container['notFoundHandler'])) {
+            $container['notFoundHandler'] = function (Container $container) {
+                return (new NotFound())
+                    ->setDisplayErrorDetails($container->get('settings')['displayErrorDetails']);
+            };
+        }
+
+        if (!isset($container['notAllowedHandler'])) {
+            $container['notAllowedHandler'] = function (Container $container) {
+                return (new NotAllowed())
+                    ->setDisplayErrorDetails($container->get('settings')['displayErrorDetails']);
+            };
+        }
+
+        return $container;
+    }
 }

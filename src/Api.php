@@ -16,6 +16,11 @@
  */
 namespace Resty\Api;
 
+// PHP
+use Exception;
+// PSR
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface;
 // Slim
 use Slim\App;
 use Slim\Container;
@@ -88,5 +93,32 @@ class Api extends App
         }
 
         return $container;
+    }
+
+    /**
+     * Redefine el handler de errores para procesar excepciones con handlers personalizados
+     *
+     * @param Exception              $e        Excepción
+     * @param ServerRequestInterface $request  Instancia de Request
+     * @param ResponseInterface      $response Instancia de Response
+     *
+     * @return ResponseInterface
+     * @throws Exception if a handler is needed and not found
+     */
+    protected function handleException(Exception $e, ServerRequestInterface $request, ResponseInterface $response)
+    {
+        $container = $this->getContainer();
+        $classNameException = get_class($e);
+
+        // Verifica si esta defindo un handler personalizado para el tipo de excepcion 
+        if (array_key_exists($classNameException, $container->get('customErrorHandler'))) {
+            $classNameHandler = $container->get('customErrorHandler')[$classNameException];
+            $handler = (new $classNameHandler())
+                ->setDisplayErrorDetails($container->get('settings')['displayErrorDetails']);
+
+            return $handler($request, $response, $e);
+        }
+
+        return parent::handleException($e, $request, $response);
     }
 }

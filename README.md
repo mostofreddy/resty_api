@@ -12,3 +12,7 @@ __0.1.0__
 ## License
 
 The MIT License (MIT). Ver el archivo [LICENSE](LICENSE.md) para más información
+
+## Changelog
+
+Ver el archivo [Changelog](Changelog.md)

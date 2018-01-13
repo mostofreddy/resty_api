@@ -37,19 +37,38 @@ $config = [
 $app = new Resty\Api\Api($config);
 
 $app->get('/', function ($request, $response, $args) {
-    $response->write("Welcome to Slim!");
-    return $response;
+    return $response->write("Welcome to Slim!");
 });
 
 $app->get('/hello[/{name}]', function ($request, $response, $args) {
-    $response->write("Hello, " . $args['name']);
-    return $response;
+    return $response->write("Hello, " . $args['name']);
 })->setArgument('name', 'World!');
 
+// Error
 $app->get('/error/1', function ($request, $response, $args) {
-    //throw new \Exception("error 1");
-    throw new \CustomErrorException("error 1");
-    return $response;
+    throw new \Exception("Error");
+});
+
+$app->get('/error/custom', function ($request, $response, $args) {
+    throw new \CustomErrorException("Error custom");
+});
+
+$app->get('/error/otro', function ($request, $response, $args) {
+    $result = eval("2*'7'");
+    return $response->abort(['mensaje' => "Esto esta mal"]);
+});
+
+// Shorcuts
+$app->get('/ok', function ($request, $response, $args) {
+    return $response->ok(['mensaje' => "Esta ok!"]);
+});
+
+$app->get('/500', function ($request, $response, $args) {
+    return $response->abort(['mensaje' => "Esto esta mal"]);
+});
+
+$app->get('/404', function ($request, $response, $args) {
+    return $response->abort404(['mensaje' => "No se encontro"]);
 });
 
 $app->run();

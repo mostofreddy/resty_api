@@ -24,10 +24,12 @@ use Psr\Http\Message\ResponseInterface;
 // Slim
 use Slim\App;
 use Slim\Container;
+use Slim\Http\Headers;
 // Api
 use Resty\Api\Handlers\Error;
 use Resty\Api\Handlers\NotFound;
 use Resty\Api\Handlers\NotAllowed;
+use Resty\Api\Http\Response;
 
 /**
  * Api
@@ -91,6 +93,12 @@ class Api extends App
                     ->setDisplayErrorDetails($container->get('settings')['displayErrorDetails']);
             };
         }
+
+        $container['response'] = function (Container $container) {
+            $headers = new Headers(['Content-Type' => 'application/json;charset=utf-8']);
+            $response = new Response(200, $headers);
+            return $response->withProtocolVersion($container->get('settings')['httpVersion']);
+        };
 
         return $container;
     }
